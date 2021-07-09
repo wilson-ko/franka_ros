@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="calibration_plate">
+  <xacro:arg name="use_gazebo_sim" default="false"/>
+  <!-- safety_distance: Minimum safety distance in [m] by which the collision volumes are expanded and which is enforced during robot motions -->
+  <xacro:macro name="calibration_plate" params="connected_to:='' ns:='' rpy:='0 0 0' xyz:='0 0 0'">
+    <xacro:unless value="${connected_to == ''}">
+      <joint name="${ns}_calibration_plate_joint" type="fixed">
+        <parent link="${connected_to}"/>
+        <child link="${ns}_calibration_plate"/>
+        <origin xyz="${xyz}" rpy="${rpy}"/>
+      </joint>
+    </xacro:unless>
+    <link name="${ns}_calibration_plate">
+      <visual>
+        <geometry>
+          <mesh filename="package://franka_description/meshes/visual/calibration_plate.stl"/>
+        </geometry>
+      </visual>
+
+      <xacro:if value="$(arg use_gazebo_sim)">
+        <inertial>
+          <origin xyz="0 0 0" rpy="0 0 0" />
+          <mass value="0.68" />
+          <inertia ixx="0.1" ixy="0.0" ixz="0.0" iyy="0.1" iyz="0.0" izz="0.1" />
+        </inertial>
+      </xacro:if>
+    </link>
+
+    <link name="aruco_marker" />
+
+    <joint name="aruco_marker_joint" type="fixed">
+      <parent link="${ns}_calibration_plate"/>
+      <child link="aruco_marker"/>
+      <origin xyz="0.03425 0 0.03425" rpy="0 0 0"/>
+    </joint>
+  </xacro:macro>
+</robot>
